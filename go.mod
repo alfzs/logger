@@ -1,4 +1,4 @@
-module github.com/alfzs/go-logger
+module github.com/alfzs/logger
 
 go 1.24.3
 
