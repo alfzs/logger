@@ -7,7 +7,7 @@ import (
 	"github.com/natefinch/lumberjack"
 )
 
-// LoggerConfig интерфейс конфигурации логгера
+// LoggerConfig интерфейс конфигурации
 type LoggerConfig interface {
 	GetLevel() string
 	GetFile() string
