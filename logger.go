@@ -7,25 +7,20 @@ import (
 	"github.com/natefinch/lumberjack"
 )
 
-// LoggerConfig интерфейс конфигурации
-type LoggerConfig interface {
-	GetLevel() string
-	GetFile() string
-	GetMaxSizeMB() int
-	GetMaxBackups() int
-	GetMaxAgeDays() int
-	GetCompress() bool
-}
-
-// LoggerParams параметры для создания логгера
-type LoggerParams struct {
-	Configs LoggerConfig
+// Config хранит настройки Logger
+type Config struct {
+	Level      string `yaml:"level" env:"LOG_LEVEL" env-default:"info"`
+	File       string `yaml:"file" env:"LOG_FILE" env-default:"logs/app.log"`
+	MaxSizeMB  int    `yaml:"max_size_mb" env:"LOG_MAX_SIZE_MB" env-default:"64"`
+	MaxBackups int    `yaml:"max_backups" env:"LOG_MAX_BACKUPS" env-default:"7"`
+	MaxAgeDays int    `yaml:"max_age_days" env:"LOG_MAX_AGE_DAYS" env-default:"30"`
+	Compress   bool   `yaml:"compress" env:"LOG_COMPRESS" env-default:"true"`
 }
 
 // NewLogger создает новый экземпляр логгера с мульти-хендлером (консоль + файл) на основе переданной конфигурации
-func NewLogger(p LoggerParams) *slog.Logger {
+func NewLogger(c Config) *slog.Logger {
 	var level slog.Level
-	switch p.Configs.GetLevel() {
+	switch c.Level {
 	case "debug":
 		level = slog.LevelDebug
 	case "info":
@@ -39,11 +34,11 @@ func NewLogger(p LoggerParams) *slog.Logger {
 	}
 
 	writer := &lumberjack.Logger{
-		Filename:   p.Configs.GetFile(),
-		MaxSize:    p.Configs.GetMaxSizeMB(),
-		MaxBackups: p.Configs.GetMaxBackups(),
-		MaxAge:     p.Configs.GetMaxAgeDays(),
-		Compress:   p.Configs.GetCompress(),
+		Filename:   c.File,
+		MaxSize:    c.MaxSizeMB,
+		MaxBackups: c.MaxBackups,
+		MaxAge:     c.MaxAgeDays,
+		Compress:   c.Compress,
 	}
 
 	consoleHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level})
